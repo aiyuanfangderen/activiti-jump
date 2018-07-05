@@ -1,5 +1,7 @@
 package demo.controller;
 
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,12 @@ public class ManagerController {
 
     @PostMapping("/createMembership")
     @ResponseBody
-    public String createMembership(String userId,String password,String groupId,String firstName,String lastName,String email){
+    public Result createMembership(String userId, String password, String groupId, String firstName, String lastName, String email){
 
         try {
-            if (userId == null) return "NoUserId";
+            if (userId == null) return new Result(ResultCode.ERROR,"NoUsername");
             User user = identityService.newUser(userId);
-            if (password == null) return "NoPassword";
+            if (password == null) return new Result(ResultCode.ERROR,"NoPassword");
             else user.setPassword(password);
             if (email != null) user.setEmail(email);
             if (firstName != null) user.setFirstName(firstName);
@@ -34,9 +36,9 @@ public class ManagerController {
             identityService.createMembership(userId,groupId);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";    //关系建立失败返回 error
+            return new Result(ResultCode.ERROR);    //关系建立失败返回 error
         }
-        return "success";   //关系建立成功返回 success
+        return new Result(ResultCode.SUCCESS);   //关系建立成功返回 success
     }
 
 }

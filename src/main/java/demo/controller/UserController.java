@@ -3,6 +3,8 @@ package demo.controller;
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
 import demo.service.UserService;
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -47,7 +49,7 @@ public class UserController {
     //提交申请（不能用于修改申请）
     @PostMapping("/userSubmit")
     @ResponseBody
-    public String userSubmit(HttpSession session, MultipartFile file){
+    public Result userSubmit(HttpSession session, MultipartFile file){
 
         try {
 
@@ -77,18 +79,18 @@ public class UserController {
             variables.put("display","待副经理审批");
             taskService.complete(task.getId(),variables);
 
-            return "success";                //提交成功返回 success
+            return new Result(ResultCode.SUCCESS);                //提交成功返回 success
 
         }catch (Exception e){
             e.printStackTrace();
-            return "error";   //提交异常返回 error
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //修改申请（不能用于提交申请）
     @PostMapping("/adjust")
     @ResponseBody
-    public String adjust(HttpSession session,String taskId,MultipartFile file){
+    public Result adjust(HttpSession session,String taskId,MultipartFile file){
         try {
             String username = (String) session.getAttribute("username");
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSS");
@@ -104,17 +106,17 @@ public class UserController {
             taskService.removeVariable(taskId,"textZ");   //删除总经理审批意见
             taskService.removeVariable(taskId,"choice");  //删除总经理选择流程对象
             taskService.complete(taskId);
-            return "success";
+            return new Result(ResultCode.SUCCESS);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //用于查询业务员查询他的申请，返回的是他所有的任务
     @GetMapping("/queryTask")
     @ResponseBody
-    public List<TaskPo> queryTask(HttpSession session){
+    public Result queryTask(HttpSession session){
 
         try {
             String username = (String) session.getAttribute("username");
@@ -136,17 +138,16 @@ public class UserController {
                 taskPo.setName(task.getName());
                 taskPoList.add(taskPo);
             }
-            return taskPoList;
+            return new Result(ResultCode.SUCCESS,taskPoList);
         }catch (Exception e){
             e.printStackTrace();
-            return null;   //异常则返回 null
+            return new Result(ResultCode.ERROR);   //异常则返回 null
         }
-
     }
 
     @PostMapping("/getFileU")
     @ResponseBody
-    public String getFileU(String taskId){
+    public Result getFileU(String taskId){
         try {
             String fileName = (String) taskService.getVariable(taskId, "file");
             File file = new File(fileName);
@@ -159,17 +160,17 @@ public class UserController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //用于放弃流程实例（不再提交申请）
     @PostMapping("/quitTask")
     @ResponseBody
-    public String quitTask(String taskId){
+    public Result quitTask(String taskId){
         try {
             Task task = taskService.createTaskQuery()
                     .taskId(taskId)
@@ -177,17 +178,17 @@ public class UserController {
             taskService.setVariable(taskId,"display","已放弃");
             String processInstanceId = task.getProcessInstanceId();
             runtimeService.deleteProcessInstance(processInstanceId,"无");
-            return "success";
+            return new Result(ResultCode.SUCCESS);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //查询历史任务实例(不进行文件下载操作)
     @GetMapping("/queryHistoryTaskU")
     @ResponseBody
-    public List<TaskPoHi> queryHistoryTaskU(HttpSession session){
+    public Result queryHistoryTaskU(HttpSession session){
 
         try {
             String username = (String) session.getAttribute("username");
@@ -222,18 +223,18 @@ public class UserController {
                 }
             }
 
-            return taskPoHiList;
+            return new Result(ResultCode.SUCCESS,taskPoHiList);
 
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //查看文件
     @PostMapping("/getFileUH")
     @ResponseBody
-    public String getFileUH(String taskId){
+    public Result getFileUH(String taskId){
         try {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                     .taskId(taskId)
@@ -254,10 +255,10 @@ public class UserController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 

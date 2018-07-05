@@ -4,6 +4,8 @@ import demo.entity.ActUser;
 import demo.entity.Manager;
 import demo.service.ManagerService;
 import demo.service.UserService;
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,9 @@ public class LoginController {
 
     @PostMapping("/login")
     @ResponseBody
-    public String login(HttpSession session,String username,String password) {
+    public Result login(HttpSession session,String username,String password) {
         try {
+            Result result = new Result();
             ActUser actUser = new ActUser();
             actUser.setID_(username);
             actUser.setPWD_(password);
@@ -47,7 +50,8 @@ public class LoginController {
                 session.setAttribute("username",username);
                 //将 username 置入 session
 
-                return group.getId();   //group.getId()//如果存在User则返回组名，如 “业务员” 等。
+                result.setResultCodeAndData(ResultCode.LOGIN_SUCCESS,group.getId());
+                return result;
             }
 
             Manager manager = new Manager();
@@ -55,25 +59,30 @@ public class LoginController {
             manager.setPassword(password);
             Manager mng = managerService.queryManagerByUsername(manager);
 
-            if (mng!=null && mng.getUsername().equals(username)) return "manager";  //如果是管理人员则返回“manager”
+            if (mng!=null && mng.getUsername().equals(username)){
+                result.setResultCodeAndData(ResultCode.LOGIN_SUCCESS,"manager");
+                return result;
+            }
 
-            else return "error";   //未查到则返回“error”
+            result.setResultCode(ResultCode.LOGIN_FAIL);
+
+            return result;
         }catch (Exception e){
             e.printStackTrace();
-            return "SystemError";  //异常返回"SystemError"
+            return new Result(ResultCode.LOGIN_FAIL);
         }
 
     }
 
     @GetMapping("/exit")
     @ResponseBody
-    public String exit(HttpSession session){
+    public Result exit(HttpSession session){
         try {
             session.invalidate();
-            return "success";    //退出登录成功
+            return new Result(ResultCode.SUCCESS);    //退出登录成功
         }catch (Exception e){
             e.printStackTrace();
-            return "error";     //退出登录异常或失败
+            return new Result(ResultCode.ERROR);     //退出登录异常或失败
         }
     }
 

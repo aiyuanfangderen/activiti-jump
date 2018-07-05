@@ -1,5 +1,7 @@
 package demo.controller;
 
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
@@ -23,24 +25,24 @@ public class ActivitiController {
 
 	@GetMapping("/deploy")
 	@ResponseBody
-	public String deploy(){
+	public Result deploy(){
 		
 		repositoryService.createDeployment()
 			.addClasspathResource("processes/demo/demo.bpmn")
 			.addClasspathResource("processes/demo/demo.png")
 			.deploy();
-		return "部署成功";
+		return new Result(ResultCode.SUCCESS,"部署成功");
 
 	}
 
 	@GetMapping("/createGroup")
 	@ResponseBody
-	public String createGroup(){
+	public Result createGroup(){
 
 		identityService.saveGroup(identityService.newGroup("业务员"));
 		identityService.saveGroup(identityService.newGroup("副经理"));
 		identityService.saveGroup(identityService.newGroup("总经理"));
 
-		return "创建组成功";
+		return new Result(ResultCode.SUCCESS,"创建组成功");
 	}
 }

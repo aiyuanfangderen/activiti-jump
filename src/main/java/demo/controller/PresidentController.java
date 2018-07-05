@@ -2,7 +2,8 @@ package demo.controller;
 
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
-import demo.entity.VariablesPo;
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -39,7 +40,7 @@ public class PresidentController {
 
     @PostMapping("/approvalByZ")
     @ResponseBody
-    public String approvalByZ(String taskId,String msg1,String text,String choice){
+    public Result approvalByZ(String taskId, String msg1, String text, String choice){
         try {
             if(msg1.equals("同意")){
                 Map<String,Object> variables = new HashMap<String, Object>();
@@ -48,7 +49,7 @@ public class PresidentController {
                 taskService.setVariable(taskId,"display","审批通过");
                 taskService.complete(taskId,variables);
 
-                return "success";              //流程正常 返回success
+                return new Result(ResultCode.SUCCESS);              //流程正常 返回success
             }
 
             else {
@@ -59,16 +60,16 @@ public class PresidentController {
                 taskService.setVariable(taskId,"display","审批未通过");
                 taskService.complete(taskId,variables);
 
-                return "success";                        //流程正常 返回success
+                return new Result(ResultCode.SUCCESS);              //流程正常返回success
             }
         }catch (Exception e){
-            return "error";              //流程异常 返回error
+            return new Result(ResultCode.ERROR);              //流程异常 返回error
         }
     }
 
     @GetMapping("/queryTaskZ")
     @ResponseBody
-    public List<TaskPo> queryTaskZ(){
+    public Result queryTaskZ(){
         try {
             List<Task> list = taskService.createTaskQuery()
                     .taskCandidateGroup("总经理")
@@ -88,17 +89,17 @@ public class PresidentController {
                 taskPo.setName(task.getName());
                 taskPoList.add(taskPo);
             }
-            return taskPoList;
+            return new Result(ResultCode.SUCCESS,taskPoList);
         }catch (Exception e){
             e.printStackTrace();
-            return null;   //异常则返回 null
+            return new Result(ResultCode.ERROR);   //异常则返回 null
         }
     }
 
     //查询历史任务实例(无法返回流程变量)
     @GetMapping("/queryHistoryTaskZ")
     @ResponseBody
-    public List<TaskPoHi> queryHistoryTaskZ(){
+    public Result queryHistoryTaskZ(){
 
         try {
 
@@ -132,18 +133,18 @@ public class PresidentController {
                 }
             }
 
-            return taskPoHiList;
+            return new Result(ResultCode.SUCCESS,taskPoHiList);
 
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //文件下载操作
     @PostMapping("/getFileZH")
     @ResponseBody
-    public String getFileZH(String taskId){
+    public Result getFileZH(String taskId){
         try {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                     .taskId(taskId)
@@ -164,16 +165,16 @@ public class PresidentController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
     @GetMapping("/getFileZ")
     @ResponseBody
-    public String getFileZ(String taskId){
+    public Result getFileZ(String taskId){
         try {
             String fileName = (String) taskService.getVariable(taskId, "file");
             File file = new File(fileName);
@@ -186,10 +187,10 @@ public class PresidentController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 

@@ -2,6 +2,8 @@ package demo.controller;
 
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
+import demo.until.Result;
+import demo.until.ResultCode;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -35,7 +37,7 @@ public class VicePresidentController {
 
     @PostMapping("/approvalByF")
     @ResponseBody
-    public String approvalByF(String taskId,String msg1,String text){
+    public Result approvalByF(String taskId, String msg1, String text){
         try {
             if(msg1.equals("同意")){
                 Map<String,Object> variables = new HashMap<String, Object>();
@@ -44,7 +46,7 @@ public class VicePresidentController {
                 taskService.setVariable(taskId,"display","待总经理审批");
                 taskService.complete(taskId,variables);
 
-                return "success";
+                return new Result(ResultCode.SUCCESS);
             }
 
             else {
@@ -54,16 +56,16 @@ public class VicePresidentController {
                 taskService.setVariable(taskId,"display","审批未通过");
                 taskService.complete(taskId,variables);
 
-                return "success";                        //流程正常返回 success
+                return new Result(ResultCode.SUCCESS);            //流程正常返回 success
             }
         }catch (Exception e){
-            return "error";              //流程异常返回 error
+            return new Result(ResultCode.ERROR);
         }
     }
 
     @GetMapping("/queryTaskF")
     @ResponseBody
-    public List<TaskPo> queryTaskF(){
+    public Result queryTaskF(){
         try {
             List<Task> list = taskService.createTaskQuery()
                     .taskCandidateGroup("副经理")
@@ -83,17 +85,18 @@ public class VicePresidentController {
                 taskPo.setName(task.getName());
                 taskPoList.add(taskPo);
             }
-            return taskPoList;
+            return new Result(ResultCode.SUCCESS,taskPoList);
+
         }catch (Exception e){
             e.printStackTrace();
-            return null;   //异常则返回 null
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //查询历史任务实例(无法返回流程变量)
     @GetMapping("/queryHistoryTaskF")
     @ResponseBody
-    public List<TaskPoHi> queryHistoryTaskF(){
+    public Result queryHistoryTaskF(){
 
         try {
 
@@ -127,18 +130,18 @@ public class VicePresidentController {
                 }
             }
 
-            return taskPoHiList;
+            return new Result(ResultCode.SUCCESS,taskPoHiList);
 
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return new Result(ResultCode.ERROR);
         }
     }
 
     //查实历史流程任务里的流程变量，需传入任务Id
     @PostMapping("/getFileFH")
     @ResponseBody
-    public String getFileFH(String taskId){
+    public Result getFileFH(String taskId){
         try {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                     .taskId(taskId)
@@ -159,16 +162,16 @@ public class VicePresidentController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
     @PostMapping("/getFileF")
     @ResponseBody
-    public String getFileF(String taskId){
+    public Result getFileF(String taskId){
         try {
             String fileName = (String) taskService.getVariable(taskId, "file");
             File file = new File(fileName);
@@ -181,10 +184,10 @@ public class VicePresidentController {
                 out.flush();
             }
             out.close();
-            return rootName;
+            return new Result(ResultCode.SUCCESS,rootName);
         }catch (Exception e){
             e.printStackTrace();
-            return "error";
+            return new Result(ResultCode.ERROR);
         }
     }
 
