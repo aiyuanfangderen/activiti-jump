@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.dto.UserDto;
 import demo.entity.ActUser;
 import demo.entity.Manager;
 import demo.service.ManagerService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +38,10 @@ public class LoginController {
 
     @PostMapping("/login")
     @ResponseBody
-    public Result login(HttpSession session,String username,String password) {
+    public Result login(HttpSession session, @RequestBody UserDto userDto) {
         try {
+            String username = userDto.getUsername();
+            String password = userDto.getPassword();
             Result result = new Result();
             ActUser actUser = new ActUser();
             actUser.setID_(username);

@@ -1,5 +1,7 @@
 package demo.controller;
 
+import demo.dto.OpinionDto;
+import demo.dto.TaskDto;
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
 import demo.until.Result;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.*;
@@ -41,14 +44,14 @@ public class VicePresidentController {
 
     @PostMapping("/approvalByF")
     @ResponseBody
-    public Result approvalByF(String taskId, String msg1, String text){
+    public Result approvalByF(@RequestBody OpinionDto opinionDto){
         try {
-            if(msg1.equals("同意")){
+            if(opinionDto.getMsg1().equals("同意")){
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg1","同意");
-                variables.put("textF",text);   //副经理的审批意见
-                taskService.setVariable(taskId,"display","待总经理审批");
-                taskService.complete(taskId,variables);
+                variables.put("textF",opinionDto.getText());   //副经理的审批意见
+                taskService.setVariable(opinionDto.getTaskId(),"display","待总经理审批");
+                taskService.complete(opinionDto.getTaskId(),variables);
 
                 return new Result(ResultCode.SUCCESS);
             }
@@ -56,9 +59,9 @@ public class VicePresidentController {
             else {
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg1","不同意");
-                variables.put("textF",text);   //副经理的审批意见
-                taskService.setVariable(taskId,"display","审批未通过");
-                taskService.complete(taskId,variables);
+                variables.put("textF",opinionDto.getText());   //副经理的审批意见
+                taskService.setVariable(opinionDto.getTaskId(),"display","审批未通过");
+                taskService.complete(opinionDto.getTaskId(),variables);
 
                 return new Result(ResultCode.SUCCESS);            //流程正常返回 success
             }
@@ -150,7 +153,8 @@ public class VicePresidentController {
     //查实历史流程任务里的流程变量，需传入任务Id
     @PostMapping("/getFileFH")
     @ResponseBody
-    public Result getFileFH(String taskId){
+    public Result getFileFH(@RequestBody TaskDto taskDto){
+        String taskId = taskDto.getTaskId();
         try {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                     .taskId(taskId)
@@ -180,7 +184,8 @@ public class VicePresidentController {
 
     @PostMapping("/getFileF")
     @ResponseBody
-    public Result getFileF(String taskId){
+    public Result getFileF(@RequestBody TaskDto taskDto){
+        String taskId = taskDto.getTaskId();
         try {
             String fileName = (String) taskService.getVariable(taskId, "file");
             File file = new File(fileName);

@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.dto.OpinionDto;
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
 import demo.until.Result;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.*;
@@ -37,14 +39,14 @@ public class PresidentController {
 
     @PostMapping("/approvalByZ")
     @ResponseBody
-    public Result approvalByZ(String taskId, String msg1, String text, String choice){
+    public Result approvalByZ(@RequestBody OpinionDto opinionDto){
         try {
-            if(msg1.equals("同意")){
+            if(opinionDto.getMsg1().equals("同意")){
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg2","同意");
-                variables.put("textZ",text);   //副经理的审批意见
-                taskService.setVariable(taskId,"display","审批通过");
-                taskService.complete(taskId,variables);
+                variables.put("textZ",opinionDto.getText());   //副经理的审批意见
+                taskService.setVariable(opinionDto.getTaskId(),"display","审批通过");
+                taskService.complete(opinionDto.getTaskId(),variables);
 
                 return new Result(ResultCode.SUCCESS);              //流程正常 返回success
             }
@@ -52,10 +54,10 @@ public class PresidentController {
             else {
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg2","不同意");
-                variables.put("choice",choice);
-                variables.put("textZ",text);   //副经理的审批意见
-                taskService.setVariable(taskId,"display","审批未通过");
-                taskService.complete(taskId,variables);
+                variables.put("choice",opinionDto.getChoice());
+                variables.put("textZ",opinionDto.getText());   //副经理的审批意见
+                taskService.setVariable(opinionDto.getTaskId(),"display","审批未通过");
+                taskService.complete(opinionDto.getTaskId(),variables);
 
                 return new Result(ResultCode.SUCCESS);              //流程正常返回success
             }

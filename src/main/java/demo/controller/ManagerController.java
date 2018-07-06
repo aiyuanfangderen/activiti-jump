@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.dto.MembershipDto;
 import demo.until.Result;
 import demo.until.ResultCode;
 import org.activiti.engine.IdentityService;
@@ -7,6 +8,7 @@ import org.activiti.engine.identity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -22,18 +24,19 @@ public class ManagerController {
 
     @PostMapping("/createMembership")
     @ResponseBody
-    public Result createMembership(String userId, String password, String groupId, String firstName, String lastName, String email){
+    public Result createMembership(@RequestBody MembershipDto membershipDto){
 
         try {
-            if (userId == null) return new Result(ResultCode.ERROR,"NoUsername");
-            User user = identityService.newUser(userId);
-            if (password == null) return new Result(ResultCode.ERROR,"NoPassword");
-            else user.setPassword(password);
-            if (email != null) user.setEmail(email);
-            if (firstName != null) user.setFirstName(firstName);
-            if (lastName != null) user.setLastName(lastName);
+            if (membershipDto.getGroupId() == null) return new Result(ResultCode.ERROR,"NoGroupId");
+            if (membershipDto.getUserId() == null) return new Result(ResultCode.ERROR,"NoUsername");
+            User user = identityService.newUser(membershipDto.getUserId());
+            if (membershipDto.getPassword() == null) return new Result(ResultCode.ERROR,"NoPassword");
+            else user.setPassword(membershipDto.getPassword());
+            if (membershipDto.getEmail() != null) user.setEmail(membershipDto.getEmail());
+            if (membershipDto.getFirstName() != null) user.setFirstName(membershipDto.getFirstName());
+            if (membershipDto.getLastName() != null) user.setLastName(membershipDto.getLastName());
             identityService.saveUser(user);
-            identityService.createMembership(userId,groupId);
+            identityService.createMembership(membershipDto.getUserId(),membershipDto.getGroupId());
         }catch (Exception e){
             e.printStackTrace();
             return new Result(ResultCode.ERROR);    //关系建立失败返回 error

@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.dto.TaskDto;
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
 import demo.service.UserService;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -152,8 +154,9 @@ public class UserController {
 
     @PostMapping("/getFileU")
     @ResponseBody
-    public Result getFileU(String taskId){
+    public Result getFileU(@RequestBody TaskDto taskDto){
         try {
+            String taskId =taskDto.getTaskId();
             String fileName = (String) taskService.getVariable(taskId, "file");
             File file = new File(fileName);
             String rootName = "C:\\Users\\xuqingyuan\\Desktop\\downywy\\"+fileName.substring(fileName.lastIndexOf("\\"));
@@ -175,7 +178,8 @@ public class UserController {
     //用于放弃流程实例（不再提交申请）
     @PostMapping("/quitTask")
     @ResponseBody
-    public Result quitTask(String taskId){
+    public Result quitTask(@RequestBody TaskDto taskDto){
+        String taskId = taskDto.getTaskId();
         try {
             Task task = taskService.createTaskQuery()
                     .taskId(taskId)
@@ -241,7 +245,8 @@ public class UserController {
     //查看文件
     @PostMapping("/getFileUH")
     @ResponseBody
-    public Result getFileUH(String taskId){
+    public Result getFileUH(@RequestBody TaskDto taskDto){
+        String taskId = taskDto.getTaskId();
         try {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                     .taskId(taskId)
