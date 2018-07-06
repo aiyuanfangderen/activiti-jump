@@ -12,12 +12,9 @@ import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +75,7 @@ public class PresidentController {
             for (Task task:
                     list) {
                 TaskPo taskPo = new TaskPo();
+                taskPo.setId(task.getId());
                 Map<String, Object> processVariables = task.getProcessVariables();
                 for (String key:
                         processVariables.keySet()) {
@@ -114,6 +112,7 @@ public class PresidentController {
                     list) {
                 if(task.getEndTime()!=null){
                     TaskPoHi taskPoHi = new TaskPoHi();
+                    taskPoHi.setId(task.getId());
                     HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                             .taskId(task.getId())
                             .singleResult();

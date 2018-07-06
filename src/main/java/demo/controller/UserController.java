@@ -127,6 +127,7 @@ public class UserController {
             for (Task task:
                  list) {
                 TaskPo taskPo = new TaskPo();
+                taskPo.setId(task.getId());     //设置任务Id
                 Map<String, Object> processVariables = task.getProcessVariables();
                 for (String key:
                      processVariables.keySet()) {
@@ -204,6 +205,7 @@ public class UserController {
                  list) {
                 if(task.getEndTime()!=null){
                     TaskPoHi taskPoHi = new TaskPoHi();
+                    taskPoHi.setId(task.getId());
                     HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                             .taskId(task.getId())
                             .singleResult();

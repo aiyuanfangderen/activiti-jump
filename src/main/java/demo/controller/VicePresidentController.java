@@ -74,6 +74,7 @@ public class VicePresidentController {
             for (Task task:
                     list) {
                 TaskPo taskPo = new TaskPo();
+                taskPo.setId(task.getId());
                 Map<String, Object> processVariables = task.getProcessVariables();
                 for (String key:
                         processVariables.keySet()) {
@@ -111,6 +112,7 @@ public class VicePresidentController {
                     list) {
                 if(task.getEndTime()!=null){
                     TaskPoHi taskPoHi = new TaskPoHi();
+                    taskPoHi.setId(task.getId());
                     HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
                             .taskId(task.getId())
                             .singleResult();
