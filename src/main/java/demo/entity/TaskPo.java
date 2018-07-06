@@ -13,6 +13,15 @@ public class TaskPo {
     private String textZ;
     private String display;
     private String id;
+    private String fileMsg;
+
+    public String getFileMsg() {
+        return fileMsg;
+    }
+
+    public void setFileMsg(String fileMsg) {
+        this.fileMsg = fileMsg;
+    }
 
     public String getId() {
         return id;

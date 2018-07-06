@@ -49,7 +49,7 @@ public class UserController {
     //提交申请（不能用于修改申请）
     @PostMapping("/userSubmit")
     @ResponseBody
-    public Result userSubmit(HttpSession session, MultipartFile file){
+    public Result userSubmit(HttpSession session, MultipartFile file,String fileMsg){
 
         try {
 
@@ -77,6 +77,7 @@ public class UserController {
 
             variables.put("file","C:\\Users\\xuqingyuan\\Desktop\\demo\\"+newFileName);
             variables.put("display","待副经理审批");
+            variables.put("fileMsg",fileMsg);
             taskService.complete(task.getId(),variables);
 
             return new Result(ResultCode.SUCCESS);                //提交成功返回 success
@@ -90,7 +91,7 @@ public class UserController {
     //修改申请（不能用于提交申请）
     @PostMapping("/adjust")
     @ResponseBody
-    public Result adjust(HttpSession session,String taskId,MultipartFile file){
+    public Result adjust(HttpSession session,String taskId,MultipartFile file,String fileMsg){
         try {
             String username = (String) session.getAttribute("username");
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSS");
@@ -100,11 +101,13 @@ public class UserController {
             file.transferTo(new File("C:\\Users\\xuqingyuan\\Desktop\\demo",newFileName));
 
             //更换文件
-            taskService.setVariable(taskId,"file","C:\\Users\\xuqingyuan\\Desktop\\demo\\"+newFileName);
-            taskService.setVariable(taskId,"display","待副经理审批");
             taskService.removeVariable(taskId,"textF");   //删除副经理审批意见
             taskService.removeVariable(taskId,"textZ");   //删除总经理审批意见
-            taskService.removeVariable(taskId,"choice");  //删除总经理选择流程对象
+            taskService.removeVariable(taskId,"choice");  //删除总经理选择流程
+            taskService.setVariable(taskId,"display","待副经理审批");
+            taskService.setVariable(taskId,"fileMsg",fileMsg);
+            taskService.setVariable(taskId,"file","C:\\Users\\xuqingyuan\\Desktop\\demo\\"+newFileName);
+
             taskService.complete(taskId);
             return new Result(ResultCode.SUCCESS);
         }catch (Exception e){
@@ -128,12 +131,13 @@ public class UserController {
                  list) {
                 TaskPo taskPo = new TaskPo();
                 taskPo.setId(task.getId());     //设置任务Id
-                Map<String, Object> processVariables = task.getProcessVariables();
+                Map<String, Object> processVariables = taskService.getVariables(task.getId());
                 for (String key:
                      processVariables.keySet()) {
                     if (key.equals("display")) taskPo.setDisplay((String) processVariables.get(key));
                     if (key.equals("textF")) taskPo.setTextF((String) processVariables.get(key));
                     if (key.equals("textZ")) taskPo.setTextZ((String) processVariables.get(key));
+                    if (key.equals("fileMsg")) taskPo.setFileMsg((String) processVariables.get(key));
                 }
                 taskPo.setStartTime(task.getCreateTime().toString());
                 taskPo.setName(task.getName());
@@ -217,6 +221,7 @@ public class UserController {
                         if (v.getVariableName().equals("textF")) taskPoHi.setTextF((String) v.getValue());
                         if (v.getVariableName().equals("textF")) taskPoHi.setTextZ((String) v.getValue());
                         if (v.getVariableName().equals("display")) taskPoHi.setDisplay((String) v.getValue());
+                        if (v.getVariableName().equals("fileMsg")) taskPoHi.setFileMsg((String) v.getValue());
                     }
                     taskPoHi.setStartTime(task.getStartTime().toString());
                     taskPoHi.setEndtime(task.getEndTime().toString());

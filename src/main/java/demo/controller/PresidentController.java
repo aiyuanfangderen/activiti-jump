@@ -76,12 +76,13 @@ public class PresidentController {
                     list) {
                 TaskPo taskPo = new TaskPo();
                 taskPo.setId(task.getId());
-                Map<String, Object> processVariables = task.getProcessVariables();
+                Map<String, Object> processVariables = taskService.getVariables(task.getId());
                 for (String key:
                         processVariables.keySet()) {
                     if (key.equals("display")) taskPo.setDisplay((String) processVariables.get(key));
                     if (key.equals("textF")) taskPo.setTextF((String) processVariables.get(key));
                     if (key.equals("textZ")) taskPo.setTextZ((String) processVariables.get(key));
+                    if (key.equals("fileMsg")) taskPo.setFileMsg((String) processVariables.get(key));
                 }
                 taskPo.setStartTime(task.getCreateTime().toString());
                 taskPo.setName(task.getName());
@@ -124,6 +125,7 @@ public class PresidentController {
                         if (v.getVariableName().equals("textF")) taskPoHi.setTextF((String) v.getValue());
                         if (v.getVariableName().equals("textF")) taskPoHi.setTextZ((String) v.getValue());
                         if (v.getVariableName().equals("display")) taskPoHi.setDisplay((String) v.getValue());
+                        if (v.getVariableName().equals("fileMsg")) taskPoHi.setFileMsg((String) v.getValue());
                     }
                     taskPoHi.setStartTime(task.getStartTime().toString());
                     taskPoHi.setEndtime(task.getEndTime().toString());
