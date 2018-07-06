@@ -6,6 +6,7 @@ package demo.until;
  * Description:
  */
 public enum ResultCode {
+    
     SUCCESS(0, "请求成功"),
     WARN(-1, "网络异常，请稍后重试"),
     ERROR(-2, "服务器端异常"),
