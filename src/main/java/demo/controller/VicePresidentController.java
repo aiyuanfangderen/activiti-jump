@@ -57,11 +57,20 @@ public class VicePresidentController {
             }
 
             else {
+                String owner = (String) taskService.getVariable(opinionDto.getTaskId(), "owner");
+                Task task = taskService.createTaskQuery()
+                        .taskId(opinionDto.getTaskId())
+                        .singleResult();
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg1","不同意");
                 variables.put("textF",opinionDto.getText());   //副经理的审批意见
                 taskService.setVariable(opinionDto.getTaskId(),"display","审批未通过");
+                String pi = task.getProcessInstanceId();
                 taskService.complete(opinionDto.getTaskId(),variables);
+                Task result = taskService.createTaskQuery()
+                        .processInstanceId(pi)
+                        .singleResult();
+                taskService.claim(result.getId(),owner);
 
                 return new Result(ResultCode.SUCCESS);            //流程正常返回 success
             }

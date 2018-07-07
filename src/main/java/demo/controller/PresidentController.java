@@ -52,12 +52,23 @@ public class PresidentController {
             }
 
             else {
+                Task task = taskService.createTaskQuery()
+                        .taskId(opinionDto.getTaskId())
+                        .singleResult();
                 Map<String,Object> variables = new HashMap<String, Object>();
                 variables.put("msg2","不同意");
                 variables.put("choice",opinionDto.getChoice());
                 variables.put("textZ",opinionDto.getText());   //副经理的审批意见
                 taskService.setVariable(opinionDto.getTaskId(),"display","审批未通过");
+                String owner = (String) taskService.getVariable(opinionDto.getTaskId(), "owner");
                 taskService.complete(opinionDto.getTaskId(),variables);
+                if (opinionDto.getChoice().equals("业务员")){
+                    String pi = task.getProcessInstanceId();
+                    Task result = taskService.createTaskQuery()
+                            .processInstanceId(pi)
+                            .singleResult();
+                    taskService.claim(result.getId(),owner);
+                }
 
                 return new Result(ResultCode.SUCCESS);              //流程正常返回success
             }

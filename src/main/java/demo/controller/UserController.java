@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.dto.FileDto;
 import demo.dto.TaskDto;
 import demo.entity.TaskPo;
 import demo.entity.TaskPoHi;
@@ -51,9 +52,12 @@ public class UserController {
     //提交申请（不能用于修改申请）
     @PostMapping("/userSubmit")
     @ResponseBody
-    public Result userSubmit(HttpSession session, MultipartFile file,String fileMsg){
+    public Result userSubmit(HttpSession session, @RequestBody FileDto fileDto){
 
         try {
+
+            MultipartFile file = fileDto.getFile();
+            String fileMsg = fileDto.getFileMsg();
 
             String processDefinitionKey = "demo";
             String username = (String) session.getAttribute("username");
@@ -80,6 +84,7 @@ public class UserController {
             variables.put("file","C:\\Users\\xuqingyuan\\Desktop\\demo\\"+newFileName);
             variables.put("display","待副经理审批");
             variables.put("fileMsg",fileMsg);
+            variables.put("owner",username);
             taskService.complete(task.getId(),variables);
 
             return new Result(ResultCode.SUCCESS);                //提交成功返回 success
