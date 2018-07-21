@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="demo.mapper.UserMapper" >
+
+   
+   
+   <insert id="insertUserInformation" parameterType="demo.entity.User">
+        insert into user(title,time,reason,userid) 
+        values(#{title},#{time},#{reason},#{userid})
+   </insert>
+   
+    <update id="insertUserState" parameterType="demo.entity.User">
+          update user set user.state=#{state} where user.id=#{id}
+   </update>
+   
+
+
+    <update id="updateUser" parameterType="demo.entity.User">
+    
+         update user set user.state=#{state},user.reason=#{reason}
+         where user.id=#{id}
+         
+    </update>
+
+
+   <!--  <select id="find" resultType="" parameterType="">
+     select * from user
+    </select>
+ -->
+ 
+        <!--   修改正在执行的任务 -->
+ <update id="updateRuTask" parameterType="demo.entity.RuTask">
+      update act_ru_task set act_ru_task.ID_=#{beforeId},act_ru_task.NAME_=#{NAME_},
+      act_ru_task.TASK_DEF_KEY_=#{TASK_DEF_KEY_},act_ru_task.ASSIGNEE_=#{ASSIGNEE_},
+      act_ru_task.CREATE_TIME_=#{CREATE_TIME_}
+      where act_ru_task.ID_=#{ID_}
+ 
+ </update>
+ 
+          <!--  修改执行对象表 -->
+ <update id="updateRuExecution" parameterType="demo.entity.RuExecution">
+      update act_ru_execution set act_ru_execution.REV_=#{REV_},
+      act_ru_execution.ACT_ID_=#{ACT_ID_}
+      where act_ru_execution.ID_=#{ID_}
+ 
+ </update>
+<!--  删除历史任务表中的数据 -->
+ <delete id="deleteHisTask" parameterType="String">
+   delete from act_hi_taskinst where act_hi_taskinst.ID_=#{ID_}
+ 
+ </delete>
+ 
+ <!-- 修改历史流程表中的数据 -->
+ <update id="updateHisTask" parameterType="demo.entity.HiTask">
+ 
+ update act_hi_taskinst set act_hi_taskinst.DURATION_=#{DURATION_},act_hi_taskinst.END_TIME_=null
+ where act_hi_taskinst.ID_=#{ID_}
+ 
+ 
+ </update>
+ 
+<!--  删除历史节点表的数据 -->
+ <delete id="deleteHisAct" parameterType="String">
+  delete from act_hi_actinst where act_hi_actinst.ID_=#{ID_}
+ </delete>
+ 
+ <!-- 修改历史节点信息 -->
+ <update id="updateHisAct" parameterType="demo.entity.HiAct">
+    update act_hi_actinst set act_hi_actinst.DURATION_=#{DURATION_},act_hi_actinst.END_TIME_=#{END_TIME_}
+    where act_hi_actinst.ID_=#{ID_}
+ 
+ </update>
+ 
+ 
+    <!-- 批量处理的相关sql -->
+    
+    <!-- 查找当前任务的执行对象id -->
+    <select id="findRuExecutionId" parameterType="String" resultType="String">
+    select act_ru_task.EXECUTION_ID_ from act_ru_task where act_ru_task.ID_=#{id}
+    
+    </select>
+ 
+ <!-- 查找上一个任务信息 -->
+    <select id="findBeforeTaskInformation" parameterType="demo.dto.ForSelect" resultType="demo.dto.ForSelect">
+    
+    select act_hi_taskinst.ID_,act_hi_taskinst.TASK_DEF_KEY_,EXECUTION_ID_,NAME_ ,act_hi_taskinst.ASSIGNEE_
+    from act_hi_taskinst where act_hi_taskinst.EXECUTION_ID_=#{EXECUTION_ID_} and 
+    act_hi_taskinst.NAME_=#{NAME_}
+    
+    
+    </select>
+ 
+ 
+  <!-- 保存用户的业务 -->
+  
+  <insert id="insertUser" parameterType="demo.entity.User">
+     insert into user(processinstance,userid,title,reason,state)
+     values(#{processinstance},#{userid},#{title},#{reason},#{state})
+  </insert>
+  
+  
+  <!-- 业务员查询他的所有业务 -->
+  <select id="findAllOperation" resultType="demo.entity.User">
+   select * from user
+  </select>
+  
+  
+  
+  <!-- 提交后将user业务表里面的字段由原来的未提交改变为副经理正在审核 -->
+  <update id="updateState" parameterType="demo.entity.User">
+  update user set user.state=#{state} where user.processinstance=#{processinstance}
+  </update>
+  <!-- 通过任务id查找实例id -->
+  <select id="findProcessinstance" parameterType="String" resultType="String">
+   select act_ru_task.PROC_INST_ID_ from act_ru_task where act_ru_task.ID_=#{ID_}
+  </select>
+ 
+ <insert id="LogRecord" parameterType="demo.entity.Log">
+    insert into log(userid,operation,content,time)
+    values(#{userid},#{operation},#{content}.#{time})
+ 
+ </insert>
+
+</mapper>

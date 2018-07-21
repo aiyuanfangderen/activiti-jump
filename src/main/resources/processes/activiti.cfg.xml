@@ -8,9 +8,9 @@
 
     <bean name="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
         <property name="jdbcDriver" value="com.mysql.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql:///180707demo"/>
-        <property name="jdbcUsername" value="XFour"/>
-        <property name="jdbcPassword" value="xuqingyuan753"/>
+        <property name="jdbcUrl" value="jdbc:mysql:///activitidemo1"/>
+        <property name="jdbcUsername" value="root"/>
+        <property name="jdbcPassword" value="123456"/>
         <property name="databaseSchemaUpdate" value="true"/>
     </bean>
 
